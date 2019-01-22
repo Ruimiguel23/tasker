@@ -21,7 +21,7 @@
                 isLoading: false,
             }
         },
-        props: ['description', 'index'],
+        props: ['description', 'index','id'],
         methods: {
             toggleLoading() {
                 this.isLoading = !this.isLoading;
@@ -31,7 +31,7 @@
                 this.cancel();
             },
             cancel() {
-                this.$emit('change-task-component', {'component': 'task', 'index': this.index});
+                this.$emit('change-task-component', {'component': 'task', 'id': this.id});
             }
         }
     }

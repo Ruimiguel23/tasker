@@ -1781,9 +1781,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Task",
   data: function data() {
@@ -1791,7 +1788,7 @@ __webpack_require__.r(__webpack_exports__);
       dataStatus: this.status
     };
   },
-  props: ['description', 'index', 'status', 'expanded'],
+  props: ['description', 'status', 'expanded', 'id'],
   watch: {
     status: function status() {
       this.dataStatus = this.status;
@@ -1801,22 +1798,16 @@ __webpack_require__.r(__webpack_exports__);
     edit: function edit() {
       this.$emit('change-task-component', {
         'component': 'task-edit',
-        'index': this.index
+        'id': this.id
       });
     },
     add: function add() {
-      this.$emit('add-task', this.index);
+      this.$emit('add-task', this.id);
     },
     changeStatus: function changeStatus() {
       this.$emit('change-status', {
         'status': this.dataStatus,
-        'index': this.index
-      });
-    },
-    toggleExpand: function toggleExpand() {
-      this.$emit('toggle-expand', {
-        'expand': !this.expanded,
-        'index': this.index
+        'id': this.id
       });
     }
   }
@@ -1855,7 +1846,7 @@ __webpack_require__.r(__webpack_exports__);
       isLoading: false
     };
   },
-  props: ['description', 'index'],
+  props: ['description', 'index', 'id'],
   methods: {
     toggleLoading: function toggleLoading() {
       this.isLoading = !this.isLoading;
@@ -1871,7 +1862,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     cancel: function cancel() {
-      this.$emit('cancel-add-task', this.index);
+      this.$emit('cancel-add-task', this.id);
     }
   }
 });
@@ -1909,7 +1900,7 @@ __webpack_require__.r(__webpack_exports__);
       isLoading: false
     };
   },
-  props: ['description', 'index'],
+  props: ['description', 'index', 'id'],
   methods: {
     toggleLoading: function toggleLoading() {
       this.isLoading = !this.isLoading;
@@ -1924,7 +1915,7 @@ __webpack_require__.r(__webpack_exports__);
     cancel: function cancel() {
       this.$emit('change-task-component', {
         'component': 'task',
-        'index': this.index
+        'id': this.id
       });
     }
   }
@@ -36783,29 +36774,24 @@ var render = function() {
     "v-layout",
     { attrs: { "align-center": "", "justify-start": "" } },
     [
-      _c(
-        "v-flex",
-        { attrs: { shrink: "" } },
-        [
-          _c("v-checkbox", {
-            attrs: { label: _vm.description },
-            on: { change: _vm.changeStatus },
-            model: {
-              value: _vm.dataStatus,
-              callback: function($$v) {
-                _vm.dataStatus = $$v
-              },
-              expression: "dataStatus"
-            }
-          })
-        ],
-        1
-      ),
+      _c("v-flex", { attrs: { shrink: "" } }, [
+        _vm._v(
+          "\n       " +
+            _vm._s(_vm.id) +
+            ". " +
+            _vm._s(_vm.description) +
+            "\n    "
+        )
+      ]),
       _vm._v(" "),
       _c(
         "v-flex",
         { attrs: { shrink: "" } },
-        [_c("v-icon", { on: { click: _vm.add } }, [_vm._v("add")])],
+        [
+          _c("v-icon", { attrs: { small: "" }, on: { click: _vm.add } }, [
+            _vm._v("add")
+          ])
+        ],
         1
       ),
       _vm._v(" "),
@@ -36823,18 +36809,7 @@ var render = function() {
       _c(
         "v-flex",
         { attrs: { shrink: "" } },
-        [_c("v-icon", [_vm._v("remove")])],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "v-flex",
-        { attrs: { shrink: "" } },
-        [
-          _c("v-icon", { on: { click: _vm.toggleExpand } }, [
-            _vm._v("keyboard_arrow_down")
-          ])
-        ],
+        [_c("v-icon", { attrs: { small: "" } }, [_vm._v("remove")])],
         1
       )
     ],
@@ -72378,27 +72353,32 @@ var app = new Vue({
       title: "First project",
       tasks: [{
         title: "Something",
+        id: 1,
         status: false,
         component: "task",
         expanded: true,
         tasks: [{
           title: "Something level 1",
+          id: 2,
           status: false,
           component: "task",
           expanded: true,
           tasks: [{
             title: "Something level 2",
+            id: 10,
             status: false,
             expanded: true,
             component: "task"
           }]
         }, {
           title: "Something2 level 1",
+          id: 3,
           status: false,
           component: "task",
           expanded: true,
           tasks: [{
             title: "Something2 level 2",
+            id: 4,
             status: false,
             expanded: true,
             component: "task"
@@ -72407,6 +72387,7 @@ var app = new Vue({
       }, {
         title: "Another Something",
         status: false,
+        id: 5,
         expanded: true,
         component: "task"
       }]
@@ -72427,20 +72408,19 @@ var app = new Vue({
   },
   created: function created() {
     this.selectedProject = this.projects[0];
-    this.deconstructTasks(this.selectedProject.tasks, 0);
   },
   methods: {
-    addTaskField: function addTaskField(index) {
-      var selectedTask = this.deconstructedTasks[index];
+    addTaskField: function addTaskField(id) {
+      var task = this.findTask(this.selectedProject.tasks, id);
       var newTask = {
         title: "",
-        component: "task-add",
-        level: selectedTask.level + 1
+        component: "task-add"
       };
-      this.deconstructedTasks.splice(index + 1, 0, newTask);
+      task.push(newTask);
     },
     changeComponent: function changeComponent(event) {
-      this.deconstructedTasks[event.index].component = event.component;
+      var task = this.findTask(this.selectedProject.tasks, event.id);
+      task.component = event.component;
     },
     deconstructTasks: function deconstructTasks(aTasks, level) {
       var _this = this;
@@ -72455,9 +72435,6 @@ var app = new Vue({
           _this.deconstructTasks(task.tasks, level + 1);
         }
       });
-    },
-    setMargin: function setMargin(level) {
-      return 50 * level + "px";
     },
     changeProject: function changeProject(project) {
       this.selectedProject = project;
@@ -72493,6 +72470,44 @@ var app = new Vue({
         this.deconstructedTasks[index + 1].expanded = expand;
         index = index + 1;
       }
+    },
+    findTask: function findTask(tasks, id) {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = tasks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var task = _step.value;
+
+          if (task.id === id) {
+            return task;
+          }
+
+          if (task.tasks) {
+            var result = this.findTask(task.tasks, id);
+
+            if (result) {
+              return result;
+            }
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      return null;
     }
   }
 });
@@ -72506,7 +72521,7 @@ var app = new Vue({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\Users\delet\OneDrive\Documentos\tasker\resources\js\main.js */"./resources/js/main.js");
+module.exports = __webpack_require__(/*! C:\Users\delet\IdeaProjects\tasker\resources\js\main.js */"./resources/js/main.js");
 
 
 /***/ })

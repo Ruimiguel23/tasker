@@ -19,24 +19,39 @@ const app = new Vue({
             tasks: [
                 {
                     title: "Something",
+                    id: 1,
                     status: false,
                     component: "task",
-                    expanded:true,
+                    expanded: true,
                     tasks: [{
                         title: "Something level 1",
+                        id: 2,
                         status: false,
                         component: "task",
-                        expanded:true,
-                        tasks: [{title: "Something level 2", status: false, expanded:true,component: "task"}]
+                        expanded: true,
+                        tasks: [{title: "Something level 2", id: 10, status: false, expanded: true, component: "task"}]
                     }, {
                         title: "Something2 level 1",
+                        id: 3,
                         status: false,
                         component: "task",
-                        expanded:true,
-                        tasks: [{title: "Something2 level 2", status: false,expanded:true, component: "task"}]
+                        expanded: true,
+                        tasks: [{
+                            title: "Something2 level 2",
+                            id: 4,
+                            status: false,
+                            expanded: true,
+                            component: "task"
+                        }]
                     }]
                 },
-                {title: "Another Something", status: false, expanded:true,component: "task"}],
+                {
+                    title: "Another Something",
+                    status: false,
+                    id: 5,
+                    expanded: true,
+                    component: "task"
+                }],
 
         }
             , {
@@ -57,20 +72,19 @@ const app = new Vue({
     },
     created() {
         this.selectedProject = this.projects[0];
-        this.deconstructTasks(this.selectedProject.tasks, 0);
     },
     methods: {
-        addTaskField(index) {
-            let selectedTask = this.deconstructedTasks[index];
+        addTaskField(id) {
+            let task = this.findTask(this.selectedProject.tasks, id);
             let newTask = {
                 title: "",
                 component: "task-add",
-                level: selectedTask.level + 1
             };
-            this.deconstructedTasks.splice(index + 1, 0, newTask);
+            task.push(newTask);
         },
         changeComponent(event) {
-            this.deconstructedTasks[event.index].component = event.component;
+            let task = this.findTask(this.selectedProject.tasks, event.id);
+            task.component = event.component;
         },
         deconstructTasks(aTasks, level) {
             aTasks.forEach(task => {
@@ -81,9 +95,6 @@ const app = new Vue({
                     this.deconstructTasks(task.tasks, level + 1);
                 }
             })
-        },
-        setMargin(level) {
-            return 50 * level + "px";
         },
         changeProject(project) {
             this.selectedProject = project;
@@ -106,7 +117,7 @@ const app = new Vue({
                 index = index + 1;
             }
         },
-        toggleExpand(event){
+        toggleExpand(event) {
             let {expand, index} = event;
             let changedTask = this.deconstructedTasks[index];
             let changedTaskLevel = changedTask.level;
@@ -114,7 +125,21 @@ const app = new Vue({
                 this.deconstructedTasks[index + 1].expanded = expand;
                 index = index + 1;
             }
-        }
+        },
+        findTask(tasks, id) {
 
+            for(let task of tasks){
+                if(task.id===id){
+                    return task
+                }
+                if(task.tasks){
+                    let result=this.findTask(task.tasks,id);
+                    if(result){
+                        return result
+                    }
+                }
+            }
+            return null;
+        },
     }
 });

@@ -71696,7 +71696,7 @@ var app = new Vue({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\Users\delet\OneDrive\Documentos\tasker\resources\js\login.js */"./resources/js/login.js");
+module.exports = __webpack_require__(/*! C:\Users\delet\IdeaProjects\tasker\resources\js\login.js */"./resources/js/login.js");
 
 
 /***/ })

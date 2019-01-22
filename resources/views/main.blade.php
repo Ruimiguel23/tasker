@@ -6,7 +6,9 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+
     <link href="https://unpkg.com/vuetify/dist/vuetify.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{asset('css/main.css')}}" >
     <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
@@ -25,9 +27,9 @@
             </v-toolbar>
             <v-divider></v-divider>
             <v-list-tile
-                    v-for="project in projects"
-                    :key="project.title"
-                    @click="changeProject(project)"
+                v-for="project in projects"
+                :key="project.title"
+                @click="changeProject(project)"
             >
                 <v-list-tile-content>
                     <v-list-tile-title>@{{project.title}}</v-list-tile-title>
@@ -40,7 +42,18 @@
         <v-container grid-list-md fluid v-if="selectedProject">
 
             <h1>@{{ selectedProject.title }}</h1>
-            <v-treeview :items="selectedProject.tasks" item-children="tasks" item-text="title" selectable></v-treeview>
+            <v-treeview item-key="id" :items="selectedProject.tasks" item-children="tasks" selectable>
+                <template slot="label" slot-scope="{item,open,leaf}">
+
+                    <component @change-task-component="changeComponent" :is="item.component" :description=item.title
+                               :id=item.id></component>
+
+                    <v-divider></v-divider>
+
+                </template>
+
+
+            </v-treeview>
             <!--
                 <v-fade-transition transition-group>
                         <div v-for="(task,index) in deconstructedTasks" :key="task.title">
