@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +17,9 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('user/{user}/projects',"Api\UserController@getProjects");
+Route::get('project/{project}/tasks',"Api\ProjectController@getTasks");
+Route::resource("/project","Api\ProjectController");
+Route::resource("/task","Api\TaskController");
+

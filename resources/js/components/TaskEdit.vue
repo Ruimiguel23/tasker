@@ -27,7 +27,7 @@
                 this.isLoading = !this.isLoading;
             },
             save() {
-                this.$emit('save-task', {'description': this.description, 'index': this.index});
+                this.$emit('save-task', {'description': this.description, 'id': this.id});
                 this.cancel();
             },
             cancel() {

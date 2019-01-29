@@ -1,7 +1,7 @@
 <template>
     <v-layout align-center justify-start>
         <v-flex shrink>
-           {{id}}. {{description}}
+           {{description}}
         </v-flex>
         <v-flex shrink>
             <v-icon small @click="add">add</v-icon>
@@ -10,9 +10,8 @@
             <v-icon small @click="edit">edit</v-icon>
         </v-flex>
         <v-flex shrink>
-            <v-icon small>remove</v-icon>
+            <v-icon small @click="remove">remove</v-icon>
         </v-flex>
-
     </v-layout>
 </template>
 
@@ -40,6 +39,9 @@
             changeStatus() {
                 this.$emit('change-status', {'status': this.dataStatus, 'id': this.id})
             },
+            remove(){
+                this.$emit('remove-task',this.id);
+            }
         }
     }
 </script>

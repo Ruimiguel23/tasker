@@ -1,11 +1,11 @@
 <template>
     <v-layout align-center justify-start>
         <v-flex shrink>
-            <v-text-field :loading="isLoading" autofocus label="Description" v-model="description"
-                          :value="description"></v-text-field>
+            <v-text-field autofocus label="Description" v-model="description"
+                          :value="title"></v-text-field>
         </v-flex>
         <v-flex shrink>
-            <v-btn @click="save">Save</v-btn>
+            <v-btn :loading="loading" @click="save">Save</v-btn>
         </v-flex>
         <v-flex shrink>
             <v-btn @click="cancel">Cancel</v-btn>
@@ -18,20 +18,18 @@
         name: "Task",
         data: function () {
             return {
-                isLoading: false,
+                description:""
             }
+        },created(){
+            this.description=this.title;
         },
-        props: ['description', 'index','id'],
+        props: ['title', 'index','id','parent_id','loading'],
         methods: {
-            toggleLoading() {
-                this.isLoading = !this.isLoading;
-            },
             save() {
-                this.$emit('save-task', {'description': this.description, 'index': this.index});
-                this.$emit('change-task-component', {'component': 'task', 'index': this.index});
+                this.$emit('save-task', {'description': this.description, 'id': this.id});
             },
             cancel() {
-                this.$emit('cancel-add-task', this.id);
+                this.$emit('cancel-add-task', {'id':this.id,'parent_id':this.parent_id});
             }
         }
     }

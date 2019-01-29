@@ -1,7 +1,10 @@
+import axios from "axios";
+import Vuetify from 'vuetify';
+
 require('./bootstrap');
 
 window.Vue = require('vue');
-import Vuetify from 'vuetify';
+
 
 Vue.use(Vuetify, {
     iconfont: "md",
@@ -13,101 +16,106 @@ const app = new Vue({
     el: '#app',
     data: {
         drawer: true,
+        projects: [],
+        open: [],
         deconstructedTasks: [],
-        projects: [{
-            title: "First project",
-            tasks: [
-                {
-                    title: "Something",
-                    id: 1,
-                    status: false,
-                    component: "task",
-                    expanded: true,
-                    tasks: [{
-                        title: "Something level 1",
-                        id: 2,
-                        status: false,
-                        component: "task",
-                        expanded: true,
-                        tasks: [{title: "Something level 2", id: 10, status: false, expanded: true, component: "task"}]
-                    }, {
-                        title: "Something2 level 1",
-                        id: 3,
-                        status: false,
-                        component: "task",
-                        expanded: true,
-                        tasks: [{
-                            title: "Something2 level 2",
-                            id: 4,
-                            status: false,
-                            expanded: true,
-                            component: "task"
-                        }]
-                    }]
-                },
-                {
-                    title: "Another Something",
-                    status: false,
-                    id: 5,
-                    expanded: true,
-                    component: "task"
-                }],
-
-        }
-            , {
-                title: "Second project",
-                tasks: [
-                    {title: "Something", component: "task"}
-                ],
-            }
-            , {
-                title: "Third Project",
-                tasks: [
-                    {title: "Something"}
-                ],
-                component: "task",
-            }
-        ],
-        selectedProject: null
+        completed: [],
+        selectedProject: null,
+        isLoading:false,
     },
     created() {
-        this.selectedProject = this.projects[0];
+
+        this.getProjects().then(response => {
+            response.data.forEach(project => this.projects.push(project));
+            this.selectedProject = this.projects[0];
+            this.getTasks(this.selectedProject.id).then(response => {
+                Vue.set(this.selectedProject, 'tasks', this.nestTasks(response.data));
+            });
+        });
+
     },
     methods: {
         addTaskField(id) {
-            let task = this.findTask(this.selectedProject.tasks, id);
-            let newTask = {
-                title: "",
-                component: "task-add",
-            };
-            task.push(newTask);
+            if (typeof id === "number") {
+                let task = this.findTask(this.selectedProject.tasks, id);
+                let newTask = {
+                    description: "",
+                    component: "task-add",
+                    id: -1,
+                    parent_id: id
+                };
+                if (!task.tasks) {
+                    Vue.set(task, 'tasks', [])
+                }
+                task.tasks.push(newTask);
+                this.open.push(id);
+            } else {
+                let newTask = {
+                    title: "",
+                    component: "task-add",
+                    id: -1,
+                    parent_id: null
+                };
+                this.selectedProject.tasks.push(newTask);
+            }
+
+
+        },
+        nestTasks(tasks) {
+            let newTask = null;
+            let oldId = null;
+            let nestedTasks = [];
+            tasks.forEach(task => {
+                task.tasks = [];
+                task.component = 'task';
+                if (task.parent_id === null) {
+                    nestedTasks.push(task);
+                } else {
+                    let foundTask = this.findTask(nestedTasks, task.parent_id);
+                    foundTask.tasks.push(task);
+                }
+            });
+            return nestedTasks;
         },
         changeComponent(event) {
             let task = this.findTask(this.selectedProject.tasks, event.id);
             task.component = event.component;
         },
-        deconstructTasks(aTasks, level) {
-            aTasks.forEach(task => {
-                let deconstructedTask = task;
-                deconstructedTask.level = level;
-                this.deconstructedTasks.push(deconstructedTask);
-                if (task.tasks) {
-                    this.deconstructTasks(task.tasks, level + 1);
-                }
-            })
-        },
         changeProject(project) {
             this.selectedProject = project;
-            this.deconstructedTasks = [];
-            this.deconstructTasks(project.tasks, 0);
+            this.open=[];
+            this.getTasks(this.selectedProject.id).then(response => {
+                Vue.set(this.selectedProject, 'tasks', this.nestTasks(response.data));
+            });
         },
         saveTask(event) {
-            let {description, index} = event;
-            this.deconstructedTasks[index].title = description;
+            let {description, id} = event;
+            let task = this.findTask(this.selectedProject.tasks, id);
+            this.isLoading=true;
+            axios.post('/api/task', {
+                'project_id': this.selectedProject.id,
+                'user_id': 1,
+                'parent_id': task.parent_id,
+                'completed': false,
+                'description': description
+            }).then(response => {
+                task.id=response.data.id;
+                task.description = description;
+                this.isLoading=false;
+                this.changeComponent({'id':task.id,'component':'task'});
+            });
         },
-        remove(index) {
-            this.deconstructedTasks.splice(index, 1);
+
+        cancelAddTask(event) {
+            let {id, parent_id} = event;
+            if (parent_id !== null) {
+                let parentTask = this.findTask(this.selectedProject.tasks, parent_id);
+                parentTask.tasks.splice(-1, 1);
+            } else {
+                this.selectedProject.tasks.splice(-1, 1);
+            }
         },
+
         changeStatus(event) {
             let {status, index} = event;
             let changedTask = this.deconstructedTasks[index];
@@ -117,29 +125,39 @@ const app = new Vue({
                 index = index + 1;
             }
         },
-        toggleExpand(event) {
-            let {expand, index} = event;
-            let changedTask = this.deconstructedTasks[index];
-            let changedTaskLevel = changedTask.level;
-            while (this.deconstructedTasks[index + 1].level > changedTaskLevel) {
-                this.deconstructedTasks[index + 1].expanded = expand;
-                index = index + 1;
-            }
+        removeTask(id){
+            this.isLoading=true
+            axios.delete('api/task/'+id).then(()=>{
+                let task = this.findTask(this.selectedProject.tasks,id);
+                if(task.parent_id){
+                    let parentTask = this.findTask(this.selectedProject.tasks,task.parent_id);
+                    parentTask.splice(parentTask.tasks.indexOf(task),1);
+                }else{
+                    this.selectedProject.tasks.splice(this.selectedProject.tasks.indexOf(task),1);
+                }
+                this.isLoading=false;
+            });
         },
-        findTask(tasks, id) {
 
-            for(let task of tasks){
-                if(task.id===id){
+        findTask(tasks, id) {
+            for (let task of tasks) {
+                if (task.id === id) {
                     return task
                 }
-                if(task.tasks){
-                    let result=this.findTask(task.tasks,id);
-                    if(result){
+                if (task.tasks) {
+                    let result = this.findTask(task.tasks, id);
+                    if (result) {
                         return result
                     }
                 }
             }
             return null;
         },
+        getProjects() {
+            return axios.get('/api/user/1/projects');
+        },
+        getTasks(projectId) {
+            return axios.get('api/project/'+projectId+'/tasks');
+        }
     }
 });

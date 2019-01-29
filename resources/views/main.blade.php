@@ -42,17 +42,12 @@
         <v-container grid-list-md fluid v-if="selectedProject">
 
             <h1>@{{ selectedProject.title }}</h1>
-            <v-treeview item-key="id" :items="selectedProject.tasks" item-children="tasks" selectable>
+            <v-treeview :value="completed"  :open="open" item-key="id" :items="selectedProject.tasks" item-children="tasks" selectable hoverable :transition=true>
+
                 <template slot="label" slot-scope="{item,open,leaf}">
-
-                    <component @change-task-component="changeComponent" :is="item.component" :description=item.title
+                    <component @remove-task="removeTask" @cancel-add-task="cancelAddTask" :parent_id="item.parent_id" @add-task="addTaskField" @save-task="saveTask" @change-task-component="changeComponent" :is="item.component" :description="item.description" :loading="isLoading"
                                :id=item.id></component>
-
-                    <v-divider></v-divider>
-
                 </template>
-
-
             </v-treeview>
             <!--
                 <v-fade-transition transition-group>
@@ -68,7 +63,8 @@
                         </div>
                 </v-fade-transition>
                 --!>
-            <p>+ Add task</p>
+            <p @click="addTaskField">+ Add task</p>
+            <v-progress-linear v-if="isLoading" :height="4" :indeterminate="true"></v-progress-linear>
 
         </v-container>
     </v-content>

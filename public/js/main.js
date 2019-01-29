@@ -1780,7 +1780,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Task",
   data: function data() {
@@ -1809,6 +1808,9 @@ __webpack_require__.r(__webpack_exports__);
         'status': this.dataStatus,
         'id': this.id
       });
+    },
+    remove: function remove() {
+      this.$emit('remove-task', this.id);
     }
   }
 });
@@ -1843,26 +1845,25 @@ __webpack_require__.r(__webpack_exports__);
   name: "Task",
   data: function data() {
     return {
-      isLoading: false
+      description: ""
     };
   },
-  props: ['description', 'index', 'id'],
+  created: function created() {
+    this.description = this.title;
+  },
+  props: ['title', 'index', 'id', 'parent_id', 'loading'],
   methods: {
-    toggleLoading: function toggleLoading() {
-      this.isLoading = !this.isLoading;
-    },
     save: function save() {
       this.$emit('save-task', {
         'description': this.description,
-        'index': this.index
-      });
-      this.$emit('change-task-component', {
-        'component': 'task',
-        'index': this.index
+        'id': this.id
       });
     },
     cancel: function cancel() {
-      this.$emit('cancel-add-task', this.id);
+      this.$emit('cancel-add-task', {
+        'id': this.id,
+        'parent_id': this.parent_id
+      });
     }
   }
 });
@@ -1908,7 +1909,7 @@ __webpack_require__.r(__webpack_exports__);
     save: function save() {
       this.$emit('save-task', {
         'description': this.description,
-        'index': this.index
+        'id': this.id
       });
       this.cancel();
     },
@@ -36775,13 +36776,7 @@ var render = function() {
     { attrs: { "align-center": "", "justify-start": "" } },
     [
       _c("v-flex", { attrs: { shrink: "" } }, [
-        _vm._v(
-          "\n       " +
-            _vm._s(_vm.id) +
-            ". " +
-            _vm._s(_vm.description) +
-            "\n    "
-        )
+        _vm._v("\n       " + _vm._s(_vm.description) + "\n    ")
       ]),
       _vm._v(" "),
       _c(
@@ -36809,7 +36804,11 @@ var render = function() {
       _c(
         "v-flex",
         { attrs: { shrink: "" } },
-        [_c("v-icon", { attrs: { small: "" } }, [_vm._v("remove")])],
+        [
+          _c("v-icon", { attrs: { small: "" }, on: { click: _vm.remove } }, [
+            _vm._v("remove")
+          ])
+        ],
         1
       )
     ],
@@ -36847,12 +36846,7 @@ var render = function() {
         { attrs: { shrink: "" } },
         [
           _c("v-text-field", {
-            attrs: {
-              loading: _vm.isLoading,
-              autofocus: "",
-              label: "Description",
-              value: _vm.description
-            },
+            attrs: { autofocus: "", label: "Description", value: _vm.title },
             model: {
               value: _vm.description,
               callback: function($$v) {
@@ -36868,7 +36862,13 @@ var render = function() {
       _c(
         "v-flex",
         { attrs: { shrink: "" } },
-        [_c("v-btn", { on: { click: _vm.save } }, [_vm._v("Save")])],
+        [
+          _c(
+            "v-btn",
+            { attrs: { loading: _vm.loading }, on: { click: _vm.save } },
+            [_vm._v("Save")]
+          )
+        ],
         1
       ),
       _vm._v(" "),
@@ -72332,13 +72332,17 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var vuetify__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuetify */ "./node_modules/vuetify/dist/vuetify.js");
-/* harmony import */ var vuetify__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuetify__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuetify__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuetify */ "./node_modules/vuetify/dist/vuetify.js");
+/* harmony import */ var vuetify__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vuetify__WEBPACK_IMPORTED_MODULE_1__);
+
+
+
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
-
-Vue.use(vuetify__WEBPACK_IMPORTED_MODULE_0___default.a, {
+Vue.use(vuetify__WEBPACK_IMPORTED_MODULE_1___default.a, {
   iconfont: "md"
 });
 Vue.component('task', __webpack_require__(/*! ./components/Task.vue */ "./resources/js/components/Task.vue").default);
@@ -72348,106 +72352,121 @@ var app = new Vue({
   el: '#app',
   data: {
     drawer: true,
+    projects: [],
+    open: [],
     deconstructedTasks: [],
-    projects: [{
-      title: "First project",
-      tasks: [{
-        title: "Something",
-        id: 1,
-        status: false,
-        component: "task",
-        expanded: true,
-        tasks: [{
-          title: "Something level 1",
-          id: 2,
-          status: false,
-          component: "task",
-          expanded: true,
-          tasks: [{
-            title: "Something level 2",
-            id: 10,
-            status: false,
-            expanded: true,
-            component: "task"
-          }]
-        }, {
-          title: "Something2 level 1",
-          id: 3,
-          status: false,
-          component: "task",
-          expanded: true,
-          tasks: [{
-            title: "Something2 level 2",
-            id: 4,
-            status: false,
-            expanded: true,
-            component: "task"
-          }]
-        }]
-      }, {
-        title: "Another Something",
-        status: false,
-        id: 5,
-        expanded: true,
-        component: "task"
-      }]
-    }, {
-      title: "Second project",
-      tasks: [{
-        title: "Something",
-        component: "task"
-      }]
-    }, {
-      title: "Third Project",
-      tasks: [{
-        title: "Something"
-      }],
-      component: "task"
-    }],
-    selectedProject: null
+    completed: [],
+    selectedProject: null,
+    isLoading: false
   },
   created: function created() {
-    this.selectedProject = this.projects[0];
+    var _this = this;
+
+    this.getProjects().then(function (response) {
+      response.data.forEach(function (project) {
+        return _this.projects.push(project);
+      });
+      _this.selectedProject = _this.projects[0];
+
+      _this.getTasks(_this.selectedProject.id).then(function (response) {
+        Vue.set(_this.selectedProject, 'tasks', _this.nestTasks(response.data));
+      });
+    });
   },
   methods: {
     addTaskField: function addTaskField(id) {
-      var task = this.findTask(this.selectedProject.tasks, id);
-      var newTask = {
-        title: "",
-        component: "task-add"
-      };
-      task.push(newTask);
+      if (typeof id === "number") {
+        var task = this.findTask(this.selectedProject.tasks, id);
+        var newTask = {
+          description: "",
+          component: "task-add",
+          id: -1,
+          parent_id: id
+        };
+
+        if (!task.tasks) {
+          Vue.set(task, 'tasks', []);
+        }
+
+        task.tasks.push(newTask);
+        this.open.push(id);
+      } else {
+        var _newTask = {
+          title: "",
+          component: "task-add",
+          id: -1,
+          parent_id: null
+        };
+        this.selectedProject.tasks.push(_newTask);
+      }
+    },
+    nestTasks: function nestTasks(tasks) {
+      var _this2 = this;
+
+      var newTask = null;
+      var oldId = null;
+      var nestedTasks = [];
+      tasks.forEach(function (task) {
+        task.tasks = [];
+        task.component = 'task';
+
+        if (task.parent_id === null) {
+          nestedTasks.push(task);
+        } else {
+          var foundTask = _this2.findTask(nestedTasks, task.parent_id);
+
+          foundTask.tasks.push(task);
+        }
+      });
+      return nestedTasks;
     },
     changeComponent: function changeComponent(event) {
       var task = this.findTask(this.selectedProject.tasks, event.id);
       task.component = event.component;
     },
-    deconstructTasks: function deconstructTasks(aTasks, level) {
-      var _this = this;
+    changeProject: function changeProject(project) {
+      var _this3 = this;
 
-      aTasks.forEach(function (task) {
-        var deconstructedTask = task;
-        deconstructedTask.level = level;
-
-        _this.deconstructedTasks.push(deconstructedTask);
-
-        if (task.tasks) {
-          _this.deconstructTasks(task.tasks, level + 1);
-        }
+      this.selectedProject = project;
+      this.open = [];
+      this.getTasks(this.selectedProject.id).then(function (response) {
+        Vue.set(_this3.selectedProject, 'tasks', _this3.nestTasks(response.data));
       });
     },
-    changeProject: function changeProject(project) {
-      this.selectedProject = project;
-      this.deconstructedTasks = [];
-      this.deconstructTasks(project.tasks, 0);
-    },
     saveTask: function saveTask(event) {
+      var _this4 = this;
+
       var description = event.description,
-          index = event.index;
-      this.deconstructedTasks[index].title = description;
+          id = event.id;
+      var task = this.findTask(this.selectedProject.tasks, id);
+      this.isLoading = true;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/task', {
+        'project_id': this.selectedProject.id,
+        'user_id': 1,
+        'parent_id': task.parent_id,
+        'completed': false,
+        'description': description
+      }).then(function (response) {
+        task.id = response.data.id;
+        task.description = description;
+        _this4.isLoading = false;
+
+        _this4.changeComponent({
+          'id': task.id,
+          'component': 'task'
+        });
+      });
     },
-    remove: function remove(index) {
-      this.deconstructedTasks.splice(index, 1);
+    cancelAddTask: function cancelAddTask(event) {
+      var id = event.id,
+          parent_id = event.parent_id;
+
+      if (parent_id !== null) {
+        var parentTask = this.findTask(this.selectedProject.tasks, parent_id);
+        parentTask.tasks.splice(-1, 1);
+      } else {
+        this.selectedProject.tasks.splice(-1, 1);
+      }
     },
     changeStatus: function changeStatus(event) {
       var status = event.status,
@@ -72460,16 +72479,23 @@ var app = new Vue({
         index = index + 1;
       }
     },
-    toggleExpand: function toggleExpand(event) {
-      var expand = event.expand,
-          index = event.index;
-      var changedTask = this.deconstructedTasks[index];
-      var changedTaskLevel = changedTask.level;
+    removeTask: function removeTask(id) {
+      var _this5 = this;
 
-      while (this.deconstructedTasks[index + 1].level > changedTaskLevel) {
-        this.deconstructedTasks[index + 1].expanded = expand;
-        index = index + 1;
-      }
+      this.isLoading = true;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.delete('api/task/' + id).then(function () {
+        var task = _this5.findTask(_this5.selectedProject.tasks, id);
+
+        if (task.parent_id) {
+          var parentTask = _this5.findTask(_this5.selectedProject.tasks, task.parent_id);
+
+          parentTask.splice(parentTask.tasks.indexOf(task), 1);
+        } else {
+          _this5.selectedProject.tasks.splice(_this5.selectedProject.tasks.indexOf(task), 1);
+        }
+
+        _this5.isLoading = false;
+      });
     },
     findTask: function findTask(tasks, id) {
       var _iteratorNormalCompletion = true;
@@ -72508,6 +72534,12 @@ var app = new Vue({
       }
 
       return null;
+    },
+    getProjects: function getProjects() {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/user/1/projects');
+    },
+    getTasks: function getTasks(projectId) {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('api/project/' + projectId + '/tasks');
     }
   }
 });
