@@ -1,7 +1,7 @@
 <template>
     <v-layout align-center justify-start>
         <v-flex shrink>
-           {{description}}
+           {{id}}. {{description}}
         </v-flex>
         <v-flex shrink>
             <v-icon small @click="add">add</v-icon>

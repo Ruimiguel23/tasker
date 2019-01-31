@@ -26,7 +26,7 @@
         props: ['title', 'index','id','parent_id','loading'],
         methods: {
             save() {
-                this.$emit('save-task', {'description': this.description, 'id': this.id});
+                this.$emit('save-task', {'description': this.description, 'id': this.id,'isNewTask':true});
             },
             cancel() {
                 this.$emit('cancel-add-task', {'id':this.id,'parent_id':this.parent_id});

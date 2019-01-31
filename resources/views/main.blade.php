@@ -42,7 +42,8 @@
         <v-container grid-list-md fluid v-if="selectedProject">
 
             <h1>@{{ selectedProject.title }}</h1>
-            <v-treeview :value="completed"  :open="open" item-key="id" :items="selectedProject.tasks" item-children="tasks" selectable hoverable :transition=true>
+            <v-divider></v-divider>
+            <v-treeview :value="completed"  :open="open" item-key="id" :items="selectedProject.tasks" item-children="tasks" selectable hoverable :transition=true style="padding-top: 1rem">
 
                 <template slot="label" slot-scope="{item,open,leaf}">
                     <component @remove-task="removeTask" @cancel-add-task="cancelAddTask" :parent_id="item.parent_id" @add-task="addTaskField" @save-task="saveTask" @change-task-component="changeComponent" :is="item.component" :description="item.description" :loading="isLoading"
@@ -64,7 +65,33 @@
                 </v-fade-transition>
                 --!>
             <p @click="addTaskField">+ Add task</p>
-            <v-progress-linear v-if="isLoading" :height="4" :indeterminate="true"></v-progress-linear>
+            <v-progress-linear v-if="isLoading" :height="2" :indeterminate="true"></v-progress-linear>
+            <v-dialog v-model="taskAddDialog">
+                <v-card>
+                    <v-card-title>
+                        <span class="headline">Sign-Up</span>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-container grid-list-md>
+                            <v-layout wrap>
+                                <v-flex xs12>
+                                    <v-text-field v-model="newDescription" label="Description" required></v-text-field>
+                                </v-flex>
+                            </v-layout>
+                        </v-container>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-layout fluid row wrap justify-space-between>
+                            <v-flex xs4 md3>
+                                <v-btn class="primary" @click="saveTask(true)" block>Submit</v-btn>
+                            </v-flex>
+                            <v-flex xs4 md3>
+                                <v-btn @click="dialog=false" flat block>Cancel</v-btn>
+                            </v-flex>
+                        </v-layout>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
 
         </v-container>
     </v-content>

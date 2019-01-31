@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-
+Route::get('project/{project}/task/new_id','Api\TaskController@getNewId');
 Route::get('user/{user}/projects',"Api\UserController@getProjects");
 Route::get('project/{project}/tasks',"Api\ProjectController@getTasks");
 Route::resource("/project","Api\ProjectController");

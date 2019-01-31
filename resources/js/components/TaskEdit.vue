@@ -27,8 +27,7 @@
                 this.isLoading = !this.isLoading;
             },
             save() {
-                this.$emit('save-task', {'description': this.description, 'id': this.id});
-                this.cancel();
+                this.$emit('save-task', {'description': this.description, 'id': this.id,'isNewTask':false});
             },
             cancel() {
                 this.$emit('change-task-component', {'component': 'task', 'id': this.id});

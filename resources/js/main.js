@@ -21,7 +21,11 @@ const app = new Vue({
         deconstructedTasks: [],
         completed: [],
         selectedProject: null,
-        isLoading:false,
+        isLoading: false,
+        taskAddDialog: false,
+        selectedTaskId: 0,
+        newDescription:"",
+        taskIds:[],
     },
     created() {
 
@@ -30,13 +34,16 @@ const app = new Vue({
             this.selectedProject = this.projects[0];
             this.getTasks(this.selectedProject.id).then(response => {
                 Vue.set(this.selectedProject, 'tasks', this.nestTasks(response.data));
+                Vue.set(this,'open',this.taskIds);
             });
         });
 
     },
     methods: {
         addTaskField(id) {
-            if (typeof id === "number") {
+            this.taskAddDialog = true;
+            this.selectedTaskId = id;
+            /*if (typeof id === "number") {
                 let task = this.findTask(this.selectedProject.tasks, id);
                 let newTask = {
                     description: "",
@@ -57,8 +64,8 @@ const app = new Vue({
                     parent_id: null
                 };
                 this.selectedProject.tasks.push(newTask);
-            }
-
+                this.open.push(id);
+            }*/
 
         },
         nestTasks(tasks) {
@@ -66,6 +73,7 @@ const app = new Vue({
             let oldId = null;
             let nestedTasks = [];
             tasks.forEach(task => {
+                this.taskIds.push(task.id);
                 task.tasks = [];
                 task.component = 'task';
                 if (task.parent_id === null) {
@@ -83,27 +91,42 @@ const app = new Vue({
         },
         changeProject(project) {
             this.selectedProject = project;
-            this.open=[];
             this.getTasks(this.selectedProject.id).then(response => {
                 Vue.set(this.selectedProject, 'tasks', this.nestTasks(response.data));
             });
         },
-        saveTask(event) {
-            let {description, id} = event;
-            let task = this.findTask(this.selectedProject.tasks, id);
-            this.isLoading=true;
-            axios.post('/api/task', {
-                'project_id': this.selectedProject.id,
-                'user_id': 1,
-                'parent_id': task.parent_id,
-                'completed': false,
-                'description': description
-            }).then(response => {
-                task.id=response.data.id;
-                task.description = description;
-                this.isLoading=false;
-                this.changeComponent({'id':task.id,'component':'task'});
-            });
+        saveTask(isNewTask) {
+            console.log(isNewTask);
+
+            if(isNewTask) {
+                let parent_id = null;
+                let parent = null;
+                console.log(this.selectedTaskId);
+                if (typeof (this.selectedTaskId) === 'number') {
+                    parent = this.findTask(this.selectedProject.tasks, this.selectedTaskId);
+                    parent_id = parent.id;
+                } else {
+                    parent = this.selectedProject;
+                }
+                this.isLoading = true;
+                if (!parent.tasks) {
+                    Vue.set(parent, 'tasks', []);
+                }
+                let newTask = {
+                    description: this.newDescription,
+                    parent_id: parent_id,
+                    component: 'task'
+                };
+                this.newTask(newTask).then(response => {
+                    newTask.id = response.data.id;
+                    this.taskAddDialog = false;
+                    parent.tasks.push(newTask);
+                    this.open.push(parent_id);
+                    this.isLoading = false;
+                });
+            }else{
+
+            }
         },
 
         cancelAddTask(event) {
@@ -115,27 +138,17 @@ const app = new Vue({
                 this.selectedProject.tasks.splice(-1, 1);
             }
         },
-
-        changeStatus(event) {
-            let {status, index} = event;
-            let changedTask = this.deconstructedTasks[index];
-            let changedTaskLevel = changedTask.level;
-            while (this.deconstructedTasks[index + 1].level > changedTaskLevel) {
-                this.deconstructedTasks[index + 1].status = status;
-                index = index + 1;
-            }
-        },
-        removeTask(id){
-            this.isLoading=true
-            axios.delete('api/task/'+id).then(()=>{
-                let task = this.findTask(this.selectedProject.tasks,id);
-                if(task.parent_id){
-                    let parentTask = this.findTask(this.selectedProject.tasks,task.parent_id);
-                    parentTask.splice(parentTask.tasks.indexOf(task),1);
-                }else{
-                    this.selectedProject.tasks.splice(this.selectedProject.tasks.indexOf(task),1);
+        removeTask(id) {
+            this.isLoading = true;
+            axios.delete('api/task/' + id).then(() => {
+                let task = this.findTask(this.selectedProject.tasks, id);
+                if (task.parent_id) {
+                    let parentTask = this.findTask(this.selectedProject.tasks, task.parent_id);
+                    parentTask.tasks.splice(parentTask.tasks.indexOf(task), 1);
+                } else {
+                    this.selectedProject.tasks.splice(this.selectedProject.tasks.indexOf(task), 1);
                 }
-                this.isLoading=false;
+                this.isLoading = false;
             });
         },
 
@@ -153,11 +166,37 @@ const app = new Vue({
             }
             return null;
         },
+
+        /**
+         * @returns {Promise}
+         */
         getProjects() {
             return axios.get('/api/user/1/projects');
         },
+        /**
+         * @param {number} projectId
+         * @returns {Promise}
+         */
         getTasks(projectId) {
-            return axios.get('api/project/'+projectId+'/tasks');
+            return axios.get('api/project/' + projectId + '/tasks');
+        },
+
+        /**
+         * @param {Object} task
+         * @param {String} description
+         * @returns {Promise}
+         */
+        newTask(task) {
+            return axios.post('/api/task', {
+                'project_id': this.selectedProject.id,
+                'user_id': 1,
+                'parent_id': task.parent_id,
+                'completed': false,
+                'description': task.description
+            })
+        },
+        newTaskId(projectId) {
+            return axios.get('/api/project/' + projectId + '/task/new_id');
         }
     }
 });
