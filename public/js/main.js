@@ -1780,11 +1780,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Task",
   data: function data() {
     return {
-      dataStatus: this.status
+      dataStatus: this.status,
+      isShowingIcons: false
     };
   },
   props: ['description', 'status', 'expanded', 'id'],
@@ -1811,6 +1816,12 @@ __webpack_require__.r(__webpack_exports__);
     },
     remove: function remove() {
       this.$emit('remove-task', this.id);
+    },
+    showIcons: function showIcons() {
+      this.isShowingIcons = true;
+    },
+    hideIcons: function hideIcons() {
+      this.isShowingIcons = false;
     }
   }
 });
@@ -1899,7 +1910,8 @@ __webpack_require__.r(__webpack_exports__);
   name: "Task",
   data: function data() {
     return {
-      isLoading: false
+      isLoading: false,
+      dataDescription: this.description
     };
   },
   props: ['description', 'index', 'id'],
@@ -1908,10 +1920,9 @@ __webpack_require__.r(__webpack_exports__);
       this.isLoading = !this.isLoading;
     },
     save: function save() {
-      this.$emit('save-task', {
-        'description': this.description,
-        'id': this.id,
-        'isNewTask': false
+      this.$emit('update-task', {
+        'description': this.dataDescription,
+        'id': this.id
       });
     },
     cancel: function cancel() {
@@ -36774,11 +36785,14 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "v-layout",
-    { attrs: { "align-center": "", "justify-start": "" } },
+    {
+      attrs: { "align-center": "", "justify-start": "" },
+      on: { mouseover: _vm.showIcons, mouseleave: _vm.hideIcons }
+    },
     [
       _c("v-flex", { attrs: { shrink: "" } }, [
         _vm._v(
-          "\n       " +
+          "\n        " +
             _vm._s(_vm.id) +
             ". " +
             _vm._s(_vm.description) +
@@ -36787,34 +36801,43 @@ var render = function() {
       ]),
       _vm._v(" "),
       _c(
-        "v-flex",
-        { attrs: { shrink: "" } },
+        "v-layout",
+        { attrs: { "align-center": "", "justify-end": "" } },
         [
-          _c("v-icon", { attrs: { small: "" }, on: { click: _vm.add } }, [
-            _vm._v("add")
-          ])
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "v-flex",
-        { attrs: { shrink: "" } },
-        [
-          _c("v-icon", { attrs: { small: "" }, on: { click: _vm.edit } }, [
-            _vm._v("edit")
-          ])
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "v-flex",
-        { attrs: { shrink: "" } },
-        [
-          _c("v-icon", { attrs: { small: "" }, on: { click: _vm.remove } }, [
-            _vm._v("remove")
-          ])
+          _c(
+            "v-flex",
+            { attrs: { shrink: "" } },
+            [
+              _c("v-icon", { attrs: { small: "" }, on: { click: _vm.add } }, [
+                _vm._v("add")
+              ])
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-flex",
+            { attrs: { shrink: "" } },
+            [
+              _c("v-icon", { attrs: { small: "" }, on: { click: _vm.edit } }, [
+                _vm._v("edit")
+              ])
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-flex",
+            { attrs: { shrink: "" } },
+            [
+              _c(
+                "v-icon",
+                { attrs: { small: "" }, on: { click: _vm.remove } },
+                [_vm._v("remove")]
+              )
+            ],
+            1
+          )
         ],
         1
       )
@@ -36927,11 +36950,11 @@ var render = function() {
               value: _vm.description
             },
             model: {
-              value: _vm.description,
+              value: _vm.dataDescription,
               callback: function($$v) {
-                _vm.description = $$v
+                _vm.dataDescription = $$v
               },
-              expression: "description"
+              expression: "dataDescription"
             }
           })
         ],
@@ -72389,29 +72412,6 @@ var app = new Vue({
     addTaskField: function addTaskField(id) {
       this.taskAddDialog = true;
       this.selectedTaskId = id;
-      /*if (typeof id === "number") {
-          let task = this.findTask(this.selectedProject.tasks, id);
-          let newTask = {
-              description: "",
-              component: "task-add",
-              id: -1,
-              parent_id: id
-          };
-          if (!task.tasks) {
-              Vue.set(task, 'tasks', [])
-          }
-          task.tasks.push(newTask);
-          this.open.push(id);
-      } else {
-          let newTask = {
-              title: "",
-              component: "task-add",
-              id: -1,
-              parent_id: null
-          };
-          this.selectedProject.tasks.push(newTask);
-          this.open.push(id);
-      }*/
     },
     nestTasks: function nestTasks(tasks) {
       var _this2 = this;
@@ -72447,72 +72447,76 @@ var app = new Vue({
         Vue.set(_this3.selectedProject, 'tasks', _this3.nestTasks(response.data));
       });
     },
-    saveTask: function saveTask(isNewTask) {
+    onUpdateTask: function onUpdateTask(event) {
       var _this4 = this;
 
-      console.log(isNewTask);
+      var description = event.description,
+          id = event.id;
+      this.isLoading = true;
+      this.updateTask(id, description).then(function (response) {
+        var task = _this4.findTask(_this4.selectedProject.tasks, id);
 
-      if (isNewTask) {
-        var parent_id = null;
-        var parent = null;
-        console.log(this.selectedTaskId);
+        task.description = response.data.description;
 
-        if (typeof this.selectedTaskId === 'number') {
-          parent = this.findTask(this.selectedProject.tasks, this.selectedTaskId);
-          parent_id = parent.id;
-        } else {
-          parent = this.selectedProject;
-        }
-
-        this.isLoading = true;
-
-        if (!parent.tasks) {
-          Vue.set(parent, 'tasks', []);
-        }
-
-        var newTask = {
-          description: this.newDescription,
-          parent_id: parent_id,
-          component: 'task'
-        };
-        this.newTask(newTask).then(function (response) {
-          newTask.id = response.data.id;
-          _this4.taskAddDialog = false;
-          parent.tasks.push(newTask);
-
-          _this4.open.push(parent_id);
-
-          _this4.isLoading = false;
+        _this4.changeComponent({
+          'id': id,
+          'component': 'task'
         });
-      } else {}
-    },
-    cancelAddTask: function cancelAddTask(event) {
-      var id = event.id,
-          parent_id = event.parent_id;
 
-      if (parent_id !== null) {
-        var parentTask = this.findTask(this.selectedProject.tasks, parent_id);
-        parentTask.tasks.splice(-1, 1);
+        _this4.isLoading = false;
+      });
+    },
+    saveTask: function saveTask() {
+      var _this5 = this;
+
+      var parent_id = null;
+      var parent = null;
+      console.log(this.selectedTaskId);
+
+      if (typeof this.selectedTaskId === 'number') {
+        parent = this.findTask(this.selectedProject.tasks, this.selectedTaskId);
+        parent_id = parent.id;
       } else {
-        this.selectedProject.tasks.splice(-1, 1);
+        parent = this.selectedProject;
       }
+
+      this.isLoading = true;
+
+      if (!parent.tasks) {
+        Vue.set(parent, 'tasks', []);
+      }
+
+      var newTask = {
+        description: this.newDescription,
+        parent_id: parent_id,
+        component: 'task'
+      };
+      this.newTask(newTask).then(function (response) {
+        newTask.id = response.data.id;
+        _this5.taskAddDialog = false;
+        parent.tasks.push(newTask);
+
+        _this5.open.push(parent_id);
+
+        _this5.isLoading = false;
+      });
     },
     removeTask: function removeTask(id) {
-      var _this5 = this;
+      var _this6 = this;
 
       this.isLoading = true;
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.delete('api/task/' + id).then(function () {
-        var task = _this5.findTask(_this5.selectedProject.tasks, id);
+        var task = _this6.findTask(_this6.selectedProject.tasks, id);
 
         if (task.parent_id) {
-          var parentTask = _this5.findTask(_this5.selectedProject.tasks, task.parent_id);
+          var parentTask = _this6.findTask(_this6.selectedProject.tasks, task.parent_id);
 
           parentTask.tasks.splice(parentTask.tasks.indexOf(task), 1);
         } else {
-          _this5.selectedProject.tasks.splice(_this5.selectedProject.tasks.indexOf(task), 1);
+          _this6.selectedProject.tasks.splice(_this6.selectedProject.tasks.indexOf(task), 1);
         }
 
-        _this5.isLoading = false;
+        _this6.isLoading = false;
       });
     },
     findTask: function findTask(tasks, id) {
@@ -72571,7 +72575,6 @@ var app = new Vue({
 
     /**
      * @param {Object} task
-     * @param {String} description
      * @returns {Promise}
      */
     newTask: function newTask(task) {
@@ -72583,8 +72586,19 @@ var app = new Vue({
         'description': task.description
       });
     },
-    newTaskId: function newTaskId(projectId) {
-      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/project/' + projectId + '/task/new_id');
+
+    /**
+     * @returns {Promise}
+     * @param {number} taskId
+     * @param {string} newDescription
+     */
+    updateTask: function updateTask(taskId, newDescription) {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.patch('api/task/' + taskId, {
+        description: newDescription
+      });
+    },
+    completeTasks: function completeTasks(tasks) {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/task/complete');
     }
   }
 });

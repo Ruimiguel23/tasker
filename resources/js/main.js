@@ -43,30 +43,6 @@ const app = new Vue({
         addTaskField(id) {
             this.taskAddDialog = true;
             this.selectedTaskId = id;
-            /*if (typeof id === "number") {
-                let task = this.findTask(this.selectedProject.tasks, id);
-                let newTask = {
-                    description: "",
-                    component: "task-add",
-                    id: -1,
-                    parent_id: id
-                };
-                if (!task.tasks) {
-                    Vue.set(task, 'tasks', [])
-                }
-                task.tasks.push(newTask);
-                this.open.push(id);
-            } else {
-                let newTask = {
-                    title: "",
-                    component: "task-add",
-                    id: -1,
-                    parent_id: null
-                };
-                this.selectedProject.tasks.push(newTask);
-                this.open.push(id);
-            }*/
-
         },
         nestTasks(tasks) {
             let newTask = null;
@@ -95,10 +71,17 @@ const app = new Vue({
                 Vue.set(this.selectedProject, 'tasks', this.nestTasks(response.data));
             });
         },
-        saveTask(isNewTask) {
-            console.log(isNewTask);
-
-            if(isNewTask) {
+        onUpdateTask(event){
+            let {description,id} = event;
+            this.isLoading = true;
+            this.updateTask(id,description).then(response=>{
+                let task = this.findTask(this.selectedProject.tasks,id);
+                task.description=response.data.description;
+                this.changeComponent({'id':id,'component':'task'});
+                this.isLoading=false;
+            });
+        },
+        saveTask() {
                 let parent_id = null;
                 let parent = null;
                 console.log(this.selectedTaskId);
@@ -124,19 +107,6 @@ const app = new Vue({
                     this.open.push(parent_id);
                     this.isLoading = false;
                 });
-            }else{
-
-            }
-        },
-
-        cancelAddTask(event) {
-            let {id, parent_id} = event;
-            if (parent_id !== null) {
-                let parentTask = this.findTask(this.selectedProject.tasks, parent_id);
-                parentTask.tasks.splice(-1, 1);
-            } else {
-                this.selectedProject.tasks.splice(-1, 1);
-            }
         },
         removeTask(id) {
             this.isLoading = true;
@@ -151,7 +121,6 @@ const app = new Vue({
                 this.isLoading = false;
             });
         },
-
         findTask(tasks, id) {
             for (let task of tasks) {
                 if (task.id === id) {
@@ -183,7 +152,6 @@ const app = new Vue({
 
         /**
          * @param {Object} task
-         * @param {String} description
          * @returns {Promise}
          */
         newTask(task) {
@@ -195,8 +163,19 @@ const app = new Vue({
                 'description': task.description
             })
         },
-        newTaskId(projectId) {
-            return axios.get('/api/project/' + projectId + '/task/new_id');
+        /**
+         * @returns {Promise}
+         * @param {number} taskId
+         * @param {string} newDescription
+         */
+        updateTask(taskId,newDescription){
+            return axios.patch('api/task/'+taskId,{
+                description:newDescription
+            })
+        },
+
+        completeTasks(tasks){
+            return axios.post('api/task/complete')
         }
     }
 });

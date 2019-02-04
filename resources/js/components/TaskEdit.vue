@@ -1,7 +1,7 @@
 <template>
     <v-layout align-center justify-start>
         <v-flex shrink>
-            <v-text-field :loading="isLoading" autofocus label="Description" v-model="description"
+            <v-text-field :loading="isLoading" autofocus label="Description" v-model="dataDescription"
                           :value="description"></v-text-field>
         </v-flex>
         <v-flex shrink>
@@ -19,6 +19,7 @@
         data: function () {
             return {
                 isLoading: false,
+                dataDescription:this.description,
             }
         },
         props: ['description', 'index','id'],
@@ -27,7 +28,7 @@
                 this.isLoading = !this.isLoading;
             },
             save() {
-                this.$emit('save-task', {'description': this.description, 'id': this.id,'isNewTask':false});
+                this.$emit('update-task', {'description': this.dataDescription, 'id': this.id});
             },
             cancel() {
                 this.$emit('change-task-component', {'component': 'task', 'id': this.id});
