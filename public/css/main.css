@@ -2,3 +2,8 @@
     margin-bottom: 10px;
     margin-top:10px
 }
+
+.selected{
+    color:#1976d2;
+    font-size:large;
+}

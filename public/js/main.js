@@ -36768,6 +36768,218 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 /***/ }),
 
+/***/ "./node_modules/tiny-cookie/tiny-cookie.js":
+/*!*************************************************!*\
+  !*** ./node_modules/tiny-cookie/tiny-cookie.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+ * tiny-cookie - A tiny cookie manipulation plugin
+ * https://github.com/Alex1990/tiny-cookie
+ * Under the MIT license | (c) Alex Chao
+ */
+
+!(function(root, factory) {
+
+  // Uses CommonJS, AMD or browser global to create a jQuery plugin.
+  // See: https://github.com/umdjs/umd
+  if (true) {
+    // Expose this plugin as an AMD module. Register an anonymous module.
+    !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+				__WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else {}
+
+}(this, function() {
+
+  'use strict';
+
+  // The public function which can get/set/remove cookie.
+  function Cookie(key, value, opts) {
+    if (value === void 0) {
+      return Cookie.get(key);
+    } else if (value === null) {
+      Cookie.remove(key);
+    } else {
+      Cookie.set(key, value, opts);
+    }
+  }
+
+  // Check if the cookie is enabled.
+  Cookie.enabled = function() {
+    var key = '__test_key';
+    var enabled;
+
+    document.cookie = key + '=1';
+    enabled = !!document.cookie;
+
+    if (enabled) Cookie.remove(key);
+
+    return enabled;
+  };
+
+  // Get the cookie value by the key.
+  Cookie.get = function(key, raw) {
+    if (typeof key !== 'string' || !key) return null;
+
+    key = '(?:^|; )' + escapeRe(key) + '(?:=([^;]*?))?(?:;|$)';
+
+    var reKey = new RegExp(key);
+    var res = reKey.exec(document.cookie);
+
+    return res !== null ? (raw ? res[1] : decodeURIComponent(res[1])) : null;
+  };
+
+  // Get the cookie's value without decoding.
+  Cookie.getRaw = function(key) {
+    return Cookie.get(key, true);
+  };
+
+  // Set a cookie.
+  Cookie.set = function(key, value, raw, opts) {
+    if (raw !== true) {
+      opts = raw;
+      raw = false;
+    }
+    opts = opts ? convert(opts) : convert({});
+    var cookie = key + '=' + (raw ? value : encodeURIComponent(value)) + opts;
+    document.cookie = cookie;
+  };
+
+  // Set a cookie without encoding the value.
+  Cookie.setRaw = function(key, value, opts) {
+    Cookie.set(key, value, true, opts);
+  };
+
+  // Remove a cookie by the specified key.
+  Cookie.remove = function(key) {
+    Cookie.set(key, 'a', { expires: new Date() });
+  };
+
+  // Helper function
+  // ---------------
+
+  // Escape special characters.
+  function escapeRe(str) {
+    return str.replace(/[.*+?^$|[\](){}\\-]/g, '\\$&');
+  }
+
+  // Convert an object to a cookie option string.
+  function convert(opts) {
+    var res = '';
+
+    for (var p in opts) {
+      if (opts.hasOwnProperty(p)) {
+
+        if (p === 'expires') {
+          var expires = opts[p];
+          if (typeof expires !== 'object') {
+            expires += typeof expires === 'number' ? 'D' : '';
+            expires = computeExpires(expires);
+          }
+          opts[p] = expires.toUTCString();
+        }
+
+        if (p === 'secure') {
+          if (opts[p]) {
+            res += ';' + p;
+          }
+
+          continue;
+        }
+
+        res += ';' + p + '=' + opts[p];
+      }
+    }
+
+    if (!opts.hasOwnProperty('path')) {
+      res += ';path=/';
+    }
+
+    return res;
+  }
+
+  // Return a future date by the given string.
+  function computeExpires(str) {
+    var expires = new Date();
+    var lastCh = str.charAt(str.length - 1);
+    var value = parseInt(str, 10);
+
+    switch (lastCh) {
+      case 'Y': expires.setFullYear(expires.getFullYear() + value); break;
+      case 'M': expires.setMonth(expires.getMonth() + value); break;
+      case 'D': expires.setDate(expires.getDate() + value); break;
+      case 'h': expires.setHours(expires.getHours() + value); break;
+      case 'm': expires.setMinutes(expires.getMinutes() + value); break;
+      case 's': expires.setSeconds(expires.getSeconds() + value); break;
+      default: expires = new Date(str);
+    }
+
+    return expires;
+  }
+
+  return Cookie;
+
+}));
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-cookie/src/vue-cookie.js":
+/*!***************************************************!*\
+  !*** ./node_modules/vue-cookie/src/vue-cookie.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+(function () {
+    Number.isInteger = Number.isInteger || function (value) {
+        return typeof value === 'number' &&
+            isFinite(value) &&
+            Math.floor(value) === value;
+    };
+    var Cookie = __webpack_require__(/*! tiny-cookie */ "./node_modules/tiny-cookie/tiny-cookie.js");
+
+    var VueCookie = {
+
+        install: function (Vue) {
+            Vue.prototype.$cookie = this;
+            Vue.cookie = this;
+        },
+        set: function (name, value, daysOrOptions) {
+            var opts = daysOrOptions;
+            if(Number.isInteger(daysOrOptions)) {
+                opts = {expires: daysOrOptions};
+            }
+            return Cookie.set(name, value, opts);
+        },
+
+        get: function (name) {
+            return Cookie.get(name);
+        },
+
+        delete: function (name, options) {
+            var opts = {expires: -1};
+            if(options !== undefined) {
+                opts = Object.assign(options, opts);
+            }
+            this.set(name, '', opts);
+        }
+    };
+
+    if (true) {
+        module.exports = VueCookie;
+    } else {}
+
+})();
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Task.vue?vue&type=template&id=e9a53c20&scoped=true&":
 /*!*******************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Task.vue?vue&type=template&id=e9a53c20&scoped=true& ***!
@@ -72372,16 +72584,30 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+
+var VueCookie = __webpack_require__(/*! vue-cookie */ "./node_modules/vue-cookie/src/vue-cookie.js");
+
+Vue.use(VueCookie);
 Vue.use(vuetify__WEBPACK_IMPORTED_MODULE_1___default.a, {
   iconfont: "md"
 });
 Vue.component('task', __webpack_require__(/*! ./components/Task.vue */ "./resources/js/components/Task.vue").default);
 Vue.component('task-edit', __webpack_require__(/*! ./components/TaskEdit.vue */ "./resources/js/components/TaskEdit.vue").default);
 Vue.component('task-add', __webpack_require__(/*! ./components/TaskAdd.vue */ "./resources/js/components/TaskAdd.vue").default);
+
+Array.prototype.diff = function (a) {
+  return this.filter(function (i) {
+    return a.indexOf(i) < 0;
+  });
+};
+
 var app = new Vue({
   el: '#app',
   data: {
+    projectAddDialog: false,
     drawer: true,
+    projectMenu: false,
+    newProjectTitle: '',
     projects: [],
     open: [],
     deconstructedTasks: [],
@@ -72391,20 +72617,46 @@ var app = new Vue({
     taskAddDialog: false,
     selectedTaskId: 0,
     newDescription: "",
-    taskIds: []
+    taskIds: [],
+    oldCompletedTasks: [],
+    user: {},
+    loaded: false,
+    snackbar: {
+      message: '',
+      top: true,
+      show: false,
+      timout: 4000
+    }
   },
   created: function created() {
     var _this = this;
 
-    this.getProjects().then(function (response) {
-      response.data.forEach(function (project) {
-        return _this.projects.push(project);
-      });
-      _this.selectedProject = _this.projects[0];
+    if (!this.$cookie.get('access_token')) {
+      window.location.href = "/";
+    }
 
-      _this.getTasks(_this.selectedProject.id).then(function (response) {
-        Vue.set(_this.selectedProject, 'tasks', _this.nestTasks(response.data));
-        Vue.set(_this, 'open', _this.taskIds);
+    axios__WEBPACK_IMPORTED_MODULE_0___default.a.defaults.headers.common = this.getHeaders();
+    this.isLoading = true;
+    this.getUser().then(function (response) {
+      _this.user = response.data;
+
+      _this.getProjects(_this.user.id).then(function (response) {
+        response.data.forEach(function (project) {
+          return _this.projects.push(project);
+        });
+        _this.snackbar.message = "Logged In Successfully";
+        _this.snackbar.show = true;
+        _this.isLoading = false;
+        _this.selectedProject = _this.projects[0];
+
+        _this.getTasks(_this.selectedProject.id).then(function (response) {
+          Vue.set(_this.selectedProject, 'tasks', _this.nestTasks(response.data));
+          Vue.set(_this, 'open', _this.taskIds);
+
+          _this.getCompletedTasks(_this.selectedProject.id).then(function (response) {
+            Vue.set(_this, 'completed', response.data);
+          });
+        });
       });
     });
   },
@@ -72442,9 +72694,19 @@ var app = new Vue({
     changeProject: function changeProject(project) {
       var _this3 = this;
 
+      this.loaded = false;
+      this.isLoading = true;
+      this.loaded = false;
       this.selectedProject = project;
       this.getTasks(this.selectedProject.id).then(function (response) {
+        _this3.taskIds = [];
         Vue.set(_this3.selectedProject, 'tasks', _this3.nestTasks(response.data));
+
+        _this3.getCompletedTasks(_this3.selectedProject.id).then(function (response) {
+          Vue.set(_this3, 'completed', response.data);
+          _this3.open = _this3.taskIds;
+          _this3.isLoading = false;
+        });
       });
     },
     onUpdateTask: function onUpdateTask(event) {
@@ -72456,7 +72718,7 @@ var app = new Vue({
       this.updateTask(id, description).then(function (response) {
         var task = _this4.findTask(_this4.selectedProject.tasks, id);
 
-        task.description = response.data.description;
+        task.description = response.data.task.description;
 
         _this4.changeComponent({
           'id': id,
@@ -72464,14 +72726,42 @@ var app = new Vue({
         });
 
         _this4.isLoading = false;
+        _this4.snackbar.message = response.data.message;
+        _this4.snackbar.show = true;
+      });
+    },
+    onDeleteProject: function onDeleteProject() {
+      var _this5 = this;
+
+      this.isLoading = true;
+      this.deleteProjectRequest(this.selectedProject.id).then(function (response) {
+        _this5.isLoading = false;
+        _this5.snackbar.message = response.data.message;
+        _this5.snackbar.show = true;
+
+        _this5.projects.splice(_this5.projects.indexOf(_this5.selectedProject), 1);
+
+        if (_this5.projects[0]) {
+          _this5.changeProject(_this5.projects[0]);
+        }
+      });
+    },
+    onDeleteProjectTasks: function onDeleteProjectTasks() {
+      var _this6 = this;
+
+      this.isLoading = true;
+      this.deleteProjectTasksRequest(this.selectedProject.id).then(function (response) {
+        _this6.isLoading = false;
+        _this6.snackbar.message = response.data.message;
+        _this6.snackbar.show = true;
+        _this6.selectedProject.tasks = [];
       });
     },
     saveTask: function saveTask() {
-      var _this5 = this;
+      var _this7 = this;
 
       var parent_id = null;
       var parent = null;
-      console.log(this.selectedTaskId);
 
       if (typeof this.selectedTaskId === 'number') {
         parent = this.findTask(this.selectedProject.tasks, this.selectedTaskId);
@@ -72492,31 +72782,35 @@ var app = new Vue({
         component: 'task'
       };
       this.newTask(newTask).then(function (response) {
-        newTask.id = response.data.id;
-        _this5.taskAddDialog = false;
+        _this7.snackbar.message = response.data.message;
+        _this7.snackbar.show = true;
+        newTask.id = response.data.task.id;
+        _this7.taskAddDialog = false;
         parent.tasks.push(newTask);
 
-        _this5.open.push(parent_id);
+        _this7.open.push(parent_id);
 
-        _this5.isLoading = false;
+        _this7.isLoading = false;
       });
     },
     removeTask: function removeTask(id) {
-      var _this6 = this;
+      var _this8 = this;
 
       this.isLoading = true;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.delete('api/task/' + id).then(function () {
-        var task = _this6.findTask(_this6.selectedProject.tasks, id);
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.delete('api/task/' + id).then(function (response) {
+        var task = _this8.findTask(_this8.selectedProject.tasks, id);
 
         if (task.parent_id) {
-          var parentTask = _this6.findTask(_this6.selectedProject.tasks, task.parent_id);
+          var parentTask = _this8.findTask(_this8.selectedProject.tasks, task.parent_id);
 
           parentTask.tasks.splice(parentTask.tasks.indexOf(task), 1);
         } else {
-          _this6.selectedProject.tasks.splice(_this6.selectedProject.tasks.indexOf(task), 1);
+          _this8.selectedProject.tasks.splice(_this8.selectedProject.tasks.indexOf(task), 1);
         }
 
-        _this6.isLoading = false;
+        _this8.isLoading = false;
+        _this8.snackbar.message = response.data.message;
+        _this8.snackbar.show = true;
       });
     },
     findTask: function findTask(tasks, id) {
@@ -72561,8 +72855,8 @@ var app = new Vue({
     /**
      * @returns {Promise}
      */
-    getProjects: function getProjects() {
-      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/user/1/projects');
+    getProjects: function getProjects(userId) {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/user/' + userId + '/projects');
     },
 
     /**
@@ -72586,6 +72880,20 @@ var app = new Vue({
         'description': task.description
       });
     },
+    onSaveProject: function onSaveProject() {
+      var _this9 = this;
+
+      this.isLoading = true;
+      this.newProjectRequest(this.newProjectTitle).then(function (response) {
+        _this9.projects.push(response.data.project);
+
+        _this9.selectedProject = _this9.projects[_this9.projects.length - 1];
+        _this9.snackbar.message = response.data.message;
+        _this9.snackbar.show = true;
+        _this9.isLoading = false;
+        _this9.projectAddDialog = false;
+      });
+    },
 
     /**
      * @returns {Promise}
@@ -72598,7 +72906,74 @@ var app = new Vue({
       });
     },
     completeTasks: function completeTasks(tasks) {
-      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/task/complete');
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/task/complete', {
+        tasks: tasks
+      });
+    },
+    incompleteTasks: function incompleteTasks(tasks) {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/task/incomplete', {
+        tasks: tasks
+      });
+    },
+    getCompletedTasks: function getCompletedTasks(projectId) {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('api/project/' + projectId + '/completed');
+    },
+    changeStatusTasks: function changeStatusTasks(tasks) {
+      var _this10 = this;
+
+      if (this.loaded) {
+        if (this.completed.length < tasks.length) {
+          this.completeTasks(tasks.diff(this.completed)).then(function () {
+            _this10.isLoading = false;
+          });
+        } else {
+          if (this.completed.length > tasks.length) {
+            this.incompleteTasks(this.completed.diff(tasks)).then(function () {
+              _this10.isLoading = false;
+            });
+          }
+        }
+
+        this.completed = tasks;
+      }
+
+      this.loaded = true;
+    },
+    getHeaders: function getHeaders() {
+      var headers = {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Authorization': 'Bearer ' + this.$cookie.get('access_token')
+      };
+      return headers;
+    },
+    getCookie: function getCookie(name) {
+      var regexp = new RegExp("(?:^" + name + "|;\s*" + name + ")=(.*?)(?:;|$)", "g");
+      var result = regexp.exec(document.cookie);
+      return result === null ? null : result[1];
+    },
+    getUser: function getUser() {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('api/user');
+    },
+    newProjectRequest: function newProjectRequest(title) {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/project/' + this.user.id, {
+        title: title
+      });
+    },
+    logout: function logout() {
+      this.$cookie.delete('access_token');
+      window.location.href = "/";
+    },
+    deleteProjectRequest: function deleteProjectRequest(projectId) {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.delete('/api/project/' + projectId);
+    },
+    deleteProjectTasksRequest: function deleteProjectTasksRequest(projectId) {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default.a.delete('/api/project/' + projectId + '/delete_tasks');
+    }
+  },
+  computed: {
+    selected: function selected(projectId) {
+      return projectId === this.selectedProject.id;
     }
   }
 });

@@ -6,8 +6,10 @@
  */
 
 require('./bootstrap');
+import axios from "axios";
 
 window.Vue = require('vue');
+
 import Vuetify from 'vuetify';
 /**
  * The following block of code may be used to automatically register your
@@ -22,7 +24,8 @@ import Vuetify from 'vuetify';
 Vue.use(Vuetify,{
     iconfont:"md",
 });
-
+var VueCookie = require('vue-cookie');
+Vue.use(VueCookie);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -33,8 +36,59 @@ const app = new Vue({
     el: '#app',
     data:{
         dialog:false,
+        email:'',
+        password:'',
+        isLoading:false,
+        registerData:{
+            email:'',
+            name:'',
+            password:'',
+        },
+        snackbar:{
+            message:'',
+            top:true,
+            show:false,
+            timout:4000
+        },
+        error:{
+            name:[],
+            email:[],
+            password:[],
+        }
     },
     methods:{
-
+        sendLoginRequest(){
+            this.isLoading=true;
+            axios.post('/api/user/login',{
+                email:this.email,
+                password:this.password,
+                headers:{
+                    'Content-Type':'application/json',
+                    'X-Requested-With':'XMLHttpRequest'
+                }
+            }).then(response=>{
+                this.isLoading=false;
+                this.$cookie.set('access_token',response.data.access_token);
+                window.location.href = "/tasks";
+            })
+        },
+        sendRegisterRequest(){
+            this.isLoading=true;
+            axios.post('api/user/register',{
+                email:this.registerData.email,
+                name:this.registerData.name,
+                password:this.registerData.password,
+            }).then(response=>{
+                console.log(response);
+                this.isLoading=false;
+                this.snackbar.message=response.data.message;
+                this.snackbar.show=true;
+                this.dialog=false;
+            }).catch(error=>{
+                this.error=error.response.data.errors;
+                console.log(error.response);
+                this.isLoading=false;
+            })
+        }
     }
 });

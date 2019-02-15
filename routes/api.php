@@ -17,9 +17,19 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('project/{project}/task/new_id','Api\TaskController@getNewId');
-Route::get('user/{user}/projects',"Api\UserController@getProjects");
-Route::get('project/{project}/tasks',"Api\ProjectController@getTasks");
-Route::resource("/project","Api\ProjectController");
-Route::resource("/task","Api\TaskController");
+Route::post('/user/login','Api\UserController@login');
+Route::post('/user/register','Api\UserController@register');
+Route::middleware('auth:api')->group(function(){
+    Route::delete('project/{project}/delete_tasks','Api\ProjectController@deleteTasks');
+    Route::post('project/{user}','Api\ProjectController@store');
+    Route::get('project/{project}/task/new_id','Api\TaskController@getNewId');
+    Route::get('user/{user}/projects',"Api\UserController@getProjects");
+    Route::get('project/{project}/tasks',"Api\ProjectController@getTasks");
+    Route::get('project/{project}/completed','Api\ProjectController@getCompleted');
+    Route::post('task/complete','Api\TaskController@complete');
+    Route::post('task/incomplete','Api\TaskController@incomplete');
+    Route::resource("/project","Api\ProjectController");
+    Route::resource("/task","Api\TaskController");
+});
+
 
