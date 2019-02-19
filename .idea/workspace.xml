@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4d4390b3-a7d0-41f7-a814-b7da0f95d7be" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/dbf5f263-c099-449b-a0f6-ba2875f58569.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/dbf5f263-c099-449b-a0f6-ba2875f58569.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/login.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/login.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/main.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/main.blade.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -78,9 +75,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="161">
               <caret line="7" column="24" selection-start-line="7" selection-start-column="24" selection-end-line="7" selection-end-column="24" />
-              <folding>
-                <element signature="n#style#0;n#v-progress-linear#0;n#v-app#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -139,8 +133,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/resources/js/login.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="278">
-              <caret line="80" column="32" selection-start-line="80" selection-start-column="32" selection-end-line="80" selection-end-column="32" />
+            <state relative-caret-position="347">
+              <caret line="83" column="44" selection-start-line="83" selection-start-column="44" selection-end-line="83" selection-end-column="44" />
             </state>
           </provider>
         </entry>
@@ -502,7 +496,8 @@
       <workItem from="1549896937658" duration="7572000" />
       <workItem from="1550145634161" duration="13841000" />
       <workItem from="1550412957848" duration="651000" />
-      <workItem from="1550576799249" duration="489000" />
+      <workItem from="1550576799249" duration="839000" />
+      <workItem from="1550577770640" duration="583000" />
     </task>
     <task id="LOCAL-00001" summary="Changed task list for treeview&#10;Add task search by id functionality">
       <created>1548167107621</created>
@@ -543,7 +538,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="198196000" />
+    <option name="totallyTimeSpent" value="199129000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -572,7 +567,7 @@
       <window_info anchor="bottom" id="Database Console" order="13" weight="0.32998884" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="1" weight="0.25" />
-      <window_info anchor="right" id="Database" order="2" visible="true" weight="0.06449893" />
+      <window_info anchor="right" id="Database" order="2" visible="true" weight="0.06396589" />
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="right" id="Theme Preview" order="4" />
       <window_info anchor="right" id="Maven" order="5" weight="0.32995737" />
@@ -749,13 +744,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/information_schema/view/tables">
-      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-        <state>
-          <filtering enabled="true" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/information_schema/view/tables" />
     <entry file="file://$PROJECT_DIR$/app/Task.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="230">
@@ -784,13 +773,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/tasks">
-      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-        <state>
-          <filtering enabled="true" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/tasks" />
     <entry file="file://$PROJECT_DIR$/composer.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="437">
@@ -812,34 +795,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/oauth_auth_codes">
-      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-        <state>
-          <filtering enabled="true" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/oauth_personal_access_clients">
-      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-        <state>
-          <filtering enabled="true" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/oauth_access_tokens">
-      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-        <state>
-          <filtering enabled="true" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/oauth_refresh_tokens">
-      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-        <state>
-          <filtering enabled="true" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/oauth_auth_codes" />
+    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/oauth_personal_access_clients" />
+    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/oauth_access_tokens" />
+    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/oauth_refresh_tokens" />
     <entry file="file://$PROJECT_DIR$/database/seeds/DatabaseSeeder.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="282">
@@ -850,24 +809,19 @@
     <entry file="file://$PROJECT_DIR$/public/js/login.js">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/users">
-      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-        <state>
-          <filtering enabled="true" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/projects">
-      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-        <state>
-          <filtering enabled="true" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/users" />
+    <entry file="das://dbf5f263-c099-449b-a0f6-ba2875f58569/database/tasker/schema/public/table/projects" />
     <entry file="file://$PROJECT_DIR$/app/User.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="276">
           <caret line="15" column="17" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/views/login.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="161">
+          <caret line="7" column="24" selection-start-line="7" selection-start-column="24" selection-end-line="7" selection-end-column="24" />
         </state>
       </provider>
     </entry>
@@ -895,6 +849,13 @@
           <folding>
             <element signature="e#7#35#0#PHP" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/views/main.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="161">
+          <caret line="7" column="16" selection-start-line="7" selection-start-column="16" selection-end-line="7" selection-end-column="16" />
         </state>
       </provider>
     </entry>
@@ -935,27 +896,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/resources/views/main.blade.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="7" column="16" selection-start-line="7" selection-start-column="16" selection-end-line="7" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/views/login.blade.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="7" column="24" selection-start-line="7" selection-start-column="24" selection-end-line="7" selection-end-column="24" />
-          <folding>
-            <element signature="n#style#0;n#v-progress-linear#0;n#v-app#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/resources/js/login.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="278">
-          <caret line="80" column="32" selection-start-line="80" selection-start-column="32" selection-end-line="80" selection-end-column="32" />
+        <state relative-caret-position="347">
+          <caret line="83" column="44" selection-start-line="83" selection-start-column="44" selection-end-line="83" selection-end-column="44" />
         </state>
       </provider>
     </entry>
