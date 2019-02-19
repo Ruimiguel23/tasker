@@ -70,6 +70,11 @@ const app = new Vue({
                 this.isLoading=false;
                 this.$cookie.set('access_token',response.data.access_token);
                 window.location.href = "/tasks";
+            }).catch(error=>{
+                this.isLoading=false;
+                console.log(error);
+                this.snackbar.message='Credentials not found';
+                this.snackbar.show=true;
             })
         },
         sendRegisterRequest(){

@@ -71940,6 +71940,11 @@ var app = new Vue({
         _this.$cookie.set('access_token', response.data.access_token);
 
         window.location.href = "/tasks";
+      }).catch(function (error) {
+        _this.isLoading = false;
+        console.log(error);
+        _this.snackbar.message = 'Credentials not found';
+        _this.snackbar.show = true;
       });
     },
     sendRegisterRequest: function sendRegisterRequest() {
